@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>打字遊戲</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            margin-top: 20px;
+        }
+
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-top: 30px;
+        }
+
+        #sentence {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+            width: 80%;
+            margin: 20px auto;
+            padding: 10px;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        #input {
+            font-size: 20px;
+            padding: 10px;
+            width: 80%;
+            text-align: center;
+        }
+
+        #message {
+            font-size: 20px;
+            margin-top: 20px;
+            color: green;
+        }
+
+        #timer {
+            font-size: 20px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>打字遊戲</h1>
+
+    <div class="game-container">
+        <div id="sentence">請開始遊戲！</div>
+        <input type="text" id="input" placeholder="輸入顯示的句子..." />
+        <div id="timer">剩餘時間：30秒</div>
+        <div id="message"></div>
+        <button id="start-btn">開始遊戲</button>
+    </div>
+
+    <script>
+        const sentenceDisplay = document.getElementById('sentence');
+        const inputField = document.getElementById('input');
+        const timerDisplay = document.getElementById('timer');
+        const messageDisplay = document.getElementById('message');
+        const startBtn = document.getElementById('start-btn');
+        
+        let timerInterval;
+        let timeLeft = 30; // 遊戲時間為 30 秒
+        let currentSentence;
+        let startTime;
+
+        // 預設句子陣列
+        const sentences = [
+            "快速棉花糖是世界上最好的零食。",
+            "打字遊戲可以提升你的打字速度。",
+            "網頁設計是學習編程的重要步驟。",
+            "學會打字可以提升你的工作效率。",
+            "你可以在這裡測試你的打字能力！"
+        ];
+
+        // 開始遊戲
+        function startGame() {
+            startBtn.disabled = true;  // 禁用開始按鈕
+            timeLeft = 30;  // 重置剩餘時間
+            inputField.disabled = false;  // 啟用輸入框
+            inputField.value = '';  // 清空輸入框
+            messageDisplay.textContent = '';  // 清空信息
+            generateSentence();
+            startTime = Date.now();  // 記錄遊戲開始時間
+            timerInterval = setInterval(countdown, 1000);  // 開始倒數計時
+        }
+
+        // 顯示隨機的句子
+        function generateSentence() {
+            const randomIndex = Math.floor(Math.random() * sentences.length);
+            currentSentence = sentences[randomIndex];
+            sentenceDisplay.textContent = currentSentence;
+        }
+
+        // 計時器
+        function countdown() {
+            timeLeft--;
+            timerDisplay.textContent = `剩餘時間：${timeLeft}秒`;
+
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);  // 停止計時
+                inputField.disabled = true;  // 禁用輸入框
+                checkResult();
+            }
+        }
+
+        // 檢查結果
+        function checkResult() {
+            const typedText = inputField.value.trim();
+            const correct = typedText === currentSentence;  // 比對輸入的句子是否正確
+
+            if (correct) {
+                messageDisplay.textContent = `恭喜，你答對了！總用時: ${((Date.now() - startTime) / 1000).toFixed(2)}秒`;
+                messageDisplay.style.color = 'green';
+                // 顯示新題目
+                generateSentence();
+                inputField.value = '';  // 清空輸入框，準備下一題
+            } else {
+                messageDisplay.textContent = '遊戲結束！你沒有答對！';
+                messageDisplay.style.color = 'red';
+            }
+        }
+
+        // 監聽輸入框
+        inputField.addEventListener('input', () => {
+            if (inputField.value === currentSentence) {
+                checkResult();  // 檢查結果，並刷新題目
+            }
+        });
+
+        // 按鈕事件：開始遊戲
+        startBtn.addEventListener('click', startGame);
+    </script>
+
+</body>
+</html>
